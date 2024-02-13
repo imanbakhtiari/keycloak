@@ -3,7 +3,7 @@
 
  ### installation of keycloak using docker
 
-### write a docker-compose.yml file
+### write a Dockerfile
 
 ```bash
 FROM quay.io/keycloak/keycloak:23.0.5 as builder
@@ -31,7 +31,35 @@ ENV KC_HOSTNAME=HOST_IP
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 ```
 
-### then just run this command
+### and then run 
+```bash
+cd /path/to/Dockerfile
+sudo docker build name:tag .
+```
+### and then 
+### then just make a docker-compose.yml file
+```bash
+version: '3.8'
+
+services:
+  mykeycloak:
+    container_name: mykeycloak
+    image: kc:v1
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=change_me
+    ports:
+      - "8443:8443"
+        # for persist data
+        #    volumes:
+        #- /opt/keycloak/:/opt/keycloak/data/h2
+    restart: always
+    command: start --optimized
+
+volumes:
+  keycloak:
+
+```
 
 ```bash
 sudo docker-compose up -d
