@@ -13,22 +13,29 @@ ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 
 # Configure a database vendor
-ENV KC_DB=postgres_DB
+ENV KC_DB=postgres
 
 WORKDIR /opt/keycloak
 # for demonstration purposes only, please make sure to use proper certificates in production instead
-RUN keytool -genkeypair -storepass password -storetype PKCS12 -keyalg RSA -keysize 2048 -dname "CN=server" -alias server -ext "SAN:c=DNS:HOST_IP,IP:127.0.0.1" -keystore conf/server.keystore
+RUN keytool -genkeypair -storepass password -storetype PKCS12 -keyalg RSA -keysize 2048 -dname "CN=server" -alias server -ext "SAN:c=DNS:194.59.170.213,IP:127.0.0.1" -keystore conf/server.keystore
+
+ADD --chown=keycloak:keycloak ./dasniko.keycloak-2fa-sms-authenticator.jar /opt/keycloak/providers/dasniko.keycloak-2fa-sms-authenticator.jar
+ADD --chown=keycloak:keycloak ./themes/custom /opt/keycloak/themes/custom
+
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:23.0.5
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
+
+
 # change these values to point to a running postgres instance
-ENV KC_DB=postgres_DB
-ENV KC_DB_URL=jdbc:postgresql://HOST_IP:5432/db
-ENV KC_DB_USERNAME=postgres_USER
-ENV KC_DB_PASSWORD=postgres_PASS
-ENV KC_HOSTNAME=HOST_IP
+ENV KC_DB=postgres
+ENV KC_DB_URL=jdbc:postgresql://194.59.170.213:5432/kc
+ENV KC_DB_USERNAME=postgres
+ENV KC_DB_PASSWORD=postgres
+ENV KC_HOSTNAME=194.59.170.213
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
+
 ```
 
 ### and then run 
